@@ -1,14 +1,15 @@
-var gaze     = require('gaze'),
-    fs       = require('fs'),
-    path     = require('path'),
-    mkdirp   = require('mkdirp'),
-    glob     = require('glob'),
-    Q        = require('q'),
-    stream   = require('readable-stream'), // For node.js 0.8.x support
-    logger   = require('./lib/logger'),
-    Pipeline = require('./lib/pipeline'),
-    _        = require('underscore'),
-    tasks    = {};
+var chokidar  = require('chokidar'),
+    fs        = require('fs'),
+    path      = require('path'),
+    mkdirp    = require('mkdirp'),
+    glob      = require('glob'),
+    minimatch = require('minimatch'),
+    Q         = require('q'),
+    stream    = require('readable-stream'), // For node.js 0.8.x support
+    logger    = require('./lib/logger'),
+    Pipeline  = require('./lib/pipeline'),
+    _         = require('underscore'),
+    tasks     = {};
 
 exports.task = function(name, task) {
   tasks[name] = task;
@@ -59,16 +60,16 @@ exports.watch = function(pattern, cb) {
       });
     };
   }
-
-  Q.nfcall(gaze, pattern)
-  .then(function(watcher) {
-    watcher.on('all', function(event, file) {
-
-      // Convert from absolute to relative path
-      cb(event, path.relative(process.cwd(), file));
-    });
-  })
-  .done();
+	
+	watcher = chokidar.watch('.', {
+	  ignored: /^\./
+	}).on('all', function(event, file) {
+    var relative = path.relative(process.cwd(), file);
+	  if (minimatch(relative, pattern)) {
+			cb(event, relative);
+	  }
+	});
+	
 };
 
 exports.read = function(stream) {
