@@ -1,5 +1,5 @@
 var chokidar  = require('chokidar'),
-    fs        = require('fs'),
+    fs        = require('graceful-fs'),
     path      = require('path'),
     mkdirp    = require('mkdirp'),
     glob      = require('glob'),
