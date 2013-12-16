@@ -62,7 +62,7 @@ exports.watch = function(pattern, cb) {
   }
 	
 	watcher = chokidar.watch('.', {
-	  ignored: /^\./
+	  ignored: /^(\.(.+)|node_modules)/
 	}).on('all', function(event, file) {
     var relative = path.relative(process.cwd(), file);
 	  if (minimatch(relative, pattern)) {
